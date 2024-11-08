@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using NAudio.Wave;
 
 namespace EZBlocker
 {
@@ -24,10 +25,49 @@ namespace EZBlocker
                 if (volumeControl != null)
                 {
                     SetMute(volumeControl.Control, mute);
+
+                    // Wenn stummgeschaltet, MP3-Datei abspielen oder TTS verwenden
+                    if (mute)
+                    {
+                        PlayAudio("intro.mp3"); // MP3-Datei abspielen
+                        Speak("Werbung erkannt. Bitte warten.");
+                    }
                 }
             }
         }
 
+        // Methode zum Abspielen einer MP3-Datei mit NAudio
+        public static void PlayAudio(string filePath)
+        {
+            try
+            {
+                using (var audioFile = new AudioFileReader(filePath))
+                using (var outputDevice = new WaveOutEvent())
+                {
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                    while (outputDevice.PlaybackState == PlaybackState.Playing)
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fehler beim Abspielen der MP3-Datei: " + ex.Message);
+            }
+        }
+
+        // Methode zur Ausgabe von Text-to-Speech
+        public static void Speak(string text)
+        {
+            using (var synth = new SpeechSynthesizer())
+            {
+                synth.Speak(text);
+            }
+        }
+    }
+}
         public static void SendPlayPause(IntPtr target)
         {
             SendMessage(target, WM_APPCOMMAND, IntPtr.Zero, (IntPtr)MEDIA_PLAYPAUSE);
