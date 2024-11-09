@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Speech.Synthesis;
 using NAudio.Wave;
 
 namespace EZBlocker
