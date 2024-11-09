@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Speech.Synthesis;
 using NAudio.Wave;
+using Windows.Phone.Notification.Management;
 
 namespace EZBlocker
 {
@@ -27,17 +27,14 @@ namespace EZBlocker
                 {
                     SetMute(volumeControl.Control, mute);
 
-                    // Wenn stummgeschaltet, MP3-Datei abspielen oder TTS verwenden
+                    // Wenn stummgeschaltet, MP3-Datei abspielen
                     if (mute)
                     {
-                        PlayAudio("intro.mp3"); // MP3-Datei abspielen
-                        Speak("Werbung erkannt. Bitte warten.");
+                        PlayAudio("intro.mp3"); // Stelle sicher, dass der Pfad korrekt ist
                     }
                 }
             }
         }
-
-        // Methode zum Abspielen einer MP3-Datei mit NAudio
         public static void PlayAudio(string filePath)
         {
             try
@@ -47,6 +44,8 @@ namespace EZBlocker
                 {
                     outputDevice.Init(audioFile);
                     outputDevice.Play();
+
+                    // Warte, bis die Wiedergabe beendet ist
                     while (outputDevice.PlaybackState == PlaybackState.Playing)
                     {
                         System.Threading.Thread.Sleep(100);
@@ -59,16 +58,6 @@ namespace EZBlocker
             }
         }
 
-        // Methode zur Ausgabe von Text-to-Speech
-        public static void Speak(string text)
-        {
-            using (var synth = new SpeechSynthesizer())
-            {
-                synth.Speak(text);
-            }
-        }
-    }
-}
         public static void SendPlayPause(IntPtr target)
         {
             SendMessage(target, WM_APPCOMMAND, IntPtr.Zero, (IntPtr)MEDIA_PLAYPAUSE);
